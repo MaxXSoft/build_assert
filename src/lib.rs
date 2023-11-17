@@ -7,22 +7,22 @@
 #[cfg(debug_assertions)]
 #[macro_export]
 macro_rules! build_error {
-  ($msg:expr) => {
-    std::panic!("{}", $msg)
+  ($($args:tt)+) => {
+    std::panic!($($args)+)
   };
 }
 
 #[cfg(not(debug_assertions))]
 extern "Rust" {
   #[doc(hidden)]
-  pub fn __build_error_impl(msg: &'static str) -> !;
+  pub fn __build_error_impl() -> !;
 }
 
 #[cfg(not(debug_assertions))]
 #[macro_export]
 macro_rules! build_error {
-  ($msg:expr) => {
-    unsafe { $crate::__build_error_impl($msg) }
+  ($($args:tt)+) => {
+    unsafe { $crate::__build_error_impl() }
   };
 }
 
@@ -61,13 +61,13 @@ mod tests {
 
   #[cfg(debug_assertions)]
   #[test]
-  #[should_panic]
+  #[should_panic(expected = "assertion failed: false")]
   fn test_build_assert_fail() {
     build_assert!(false);
   }
 
   fn assert_const<const N: usize>() {
-    build_assert!(N > 10);
+    build_assert!(N > 10, "N must be greater than 10, got {}", N);
   }
 
   #[test]
@@ -77,7 +77,7 @@ mod tests {
 
   #[cfg(debug_assertions)]
   #[test]
-  #[should_panic]
+  #[should_panic(expected = "N must be greater than 10, got 10")]
   fn test_assert_const_fail() {
     assert_const::<10>();
   }
