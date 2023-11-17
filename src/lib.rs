@@ -2,6 +2,7 @@
 // 1. no std
 // 2. reference
 // 3. doc tests
+// 4. more doc comments
 
 #[cfg(debug_assertions)]
 #[macro_export]
@@ -24,6 +25,18 @@ macro_rules! build_error {
   };
 }
 
+/// Asserts that a boolean expression is true at build-time.
+///
+/// # Examples
+///
+/// ```
+/// fn foo<const N: usize>() {
+///   build_assert::build_assert!(N.is_power_of_two());
+/// }
+///
+/// foo::<16>();    // Fine.
+/// // foo::<15>(); // Fails to compile in release mode, panics in debug mode.
+/// ```
 #[macro_export]
 macro_rules! build_assert {
   ($cond:expr $(,)?) => {
