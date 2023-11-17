@@ -31,13 +31,14 @@ macro_rules! build_error {
 ///
 /// # Examples
 ///
-/// ```
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
 /// fn foo<const N: usize>() {
 ///   build_assert::build_assert!(N.is_power_of_two());
 /// }
 ///
-/// foo::<16>();    // Fine.
-/// // foo::<15>(); // Fails to compile in release mode, panics in debug mode.
+/// foo::<16>(); // Fine.
+/// foo::<15>(); // Fails to compile in release mode, panics in debug mode.
 /// ```
 #[macro_export]
 macro_rules! build_assert {
