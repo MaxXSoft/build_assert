@@ -52,6 +52,37 @@ macro_rules! build_assert {
   };
 }
 
+#[macro_export]
+macro_rules! build_assert_eq {
+  ($left:expr, $right:expr $(,)?) => {
+    match (&$left, &$right) {
+      (left_val, right_val) => {
+        if !(*left_val == *right_val) {
+          $crate::build_error!(
+            "assertion `left == right` failed\n  left: {:?}\n right: {:?}",
+            &*left_val,
+            &*right_val,
+          );
+        }
+      }
+    }
+  };
+  ($left:expr, $right:expr, $($arg:tt)+) => {
+    match (&$left, &$right) {
+      (left_val, right_val) => {
+        if !(*left_val == *right_val) {
+          $crate::build_error!(
+            "assertion `left == right` failed: {}\n  left: {:?}\n right: {:?}",
+            format!($($arg)+),
+            &*left_val,
+            &*right_val,
+          );
+        }
+      }
+    }
+  };
+}
+
 #[cfg(test)]
 mod tests {
   #[test]
@@ -80,5 +111,33 @@ mod tests {
   #[should_panic(expected = "N must be greater than 10, got 10")]
   fn test_assert_const_fail() {
     assert_const::<10>();
+  }
+
+  #[test]
+  fn test_build_assert_eq() {
+    build_assert_eq!(1, 1);
+  }
+
+  #[cfg(debug_assertions)]
+  #[test]
+  #[should_panic(expected = "assertion `left == right` failed\n  left: 1\n right: 2")]
+  fn test_build_assert_eq_fail() {
+    build_assert_eq!(1, 2);
+  }
+
+  fn assert_const_eq<const A: usize, const B: usize>() {
+    build_assert_eq!(A, B, "A must be equal to B, got {} and {}", A, B);
+  }
+
+  #[test]
+  fn test_assert_const_eq() {
+    assert_const_eq::<1, 1>();
+  }
+
+  #[cfg(debug_assertions)]
+  #[test]
+  #[should_panic(expected = "assertion `left == right` failed: A must be equal to B, got 1 and 2\n  left: 1\n right: 2")]
+  fn test_assert_const_eq_fail() {
+    assert_const_eq::<1, 2>();
   }
 }
