@@ -37,3 +37,34 @@ macro_rules! build_assert {
     }
   };
 }
+
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn test_build_assert() {
+    build_assert!(true);
+  }
+
+  #[cfg(debug_assertions)]
+  #[test]
+  #[should_panic]
+  fn test_build_assert_fail() {
+    build_assert!(false);
+  }
+
+  fn assert_const<const N: usize>() {
+    build_assert!(N > 10);
+  }
+
+  #[test]
+  fn test_assert_const() {
+    assert_const::<11>();
+  }
+
+  #[cfg(debug_assertions)]
+  #[test]
+  #[should_panic]
+  fn test_assert_const_fail() {
+    assert_const::<10>();
+  }
+}
