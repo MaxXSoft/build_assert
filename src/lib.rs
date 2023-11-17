@@ -5,21 +5,21 @@
 // 2. doc tests
 // 3. more doc comments
 
-#[cfg(not(debug_assertions))]
+#[cfg(build = "release")]
 extern "Rust" {
   #[doc(hidden)]
   pub fn __build_error_impl() -> !;
 }
 
 /// Emits an error at build-time.
-#[cfg(debug_assertions)]
+#[cfg(build = "debug")]
 #[macro_export]
 macro_rules! build_error {
   ($($args:tt)*) => {
     core::panic!($($args)*)
   };
 }
-#[cfg(not(debug_assertions))]
+#[cfg(build = "release")]
 #[macro_export]
 macro_rules! build_error {
   ($($args:tt)*) => {
@@ -123,7 +123,7 @@ mod tests {
     build_assert!(true);
   }
 
-  #[cfg(debug_assertions)]
+  #[cfg(build = "debug")]
   #[test]
   #[should_panic(expected = "assertion failed: false")]
   fn test_build_assert_fail() {
@@ -139,7 +139,7 @@ mod tests {
     assert_const::<11>();
   }
 
-  #[cfg(debug_assertions)]
+  #[cfg(build = "debug")]
   #[test]
   #[should_panic(expected = "N must be greater than 10, got 10")]
   fn test_assert_const_fail() {
@@ -151,7 +151,7 @@ mod tests {
     build_assert_eq!(1, 1);
   }
 
-  #[cfg(debug_assertions)]
+  #[cfg(build = "debug")]
   #[test]
   #[should_panic(expected = "assertion `left == right` failed\n  left: 1\n right: 2")]
   fn test_build_assert_eq_fail() {
@@ -167,7 +167,7 @@ mod tests {
     assert_const_eq::<1, 1>();
   }
 
-  #[cfg(debug_assertions)]
+  #[cfg(build = "debug")]
   #[test]
   #[should_panic(
     expected = "assertion `left == right` failed: A must be equal to B, got 1 and 2\n  left: 1\n right: 2"
@@ -181,7 +181,7 @@ mod tests {
     build_assert_ne!(1, 2);
   }
 
-  #[cfg(debug_assertions)]
+  #[cfg(build = "debug")]
   #[test]
   #[should_panic(expected = "assertion `left != right` failed\n  left: 1\n right: 1")]
   fn test_build_assert_ne_fail() {
@@ -197,7 +197,7 @@ mod tests {
     assert_const_ne::<1, 2>();
   }
 
-  #[cfg(debug_assertions)]
+  #[cfg(build = "debug")]
   #[test]
   #[should_panic(
     expected = "assertion `left != right` failed: A must not be equal to B, got 1 and 1\n  left: 1\n right: 1"
