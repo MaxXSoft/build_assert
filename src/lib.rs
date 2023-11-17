@@ -14,6 +14,7 @@ macro_rules! build_error {
 
 #[cfg(not(debug_assertions))]
 extern "Rust" {
+  #[doc(hidden)]
   pub fn __build_error_impl(msg: &'static str) -> !;
 }
 
