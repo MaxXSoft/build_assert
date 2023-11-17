@@ -1,16 +1,9 @@
-// TODO:
-// 1. no std
-// 2. reference
-// 3. doc tests
-// 4. more doc comments
+#![no_std]
 
-#[cfg(debug_assertions)]
-#[macro_export]
-macro_rules! build_error {
-  ($($args:tt)+) => {
-    std::panic!($($args)+)
-  };
-}
+// TODO:
+// 1. reference
+// 2. doc tests
+// 3. more doc comments
 
 #[cfg(not(debug_assertions))]
 extern "Rust" {
@@ -18,10 +11,18 @@ extern "Rust" {
   pub fn __build_error_impl() -> !;
 }
 
+/// Emits an error at build-time.
+#[cfg(debug_assertions)]
+#[macro_export]
+macro_rules! build_error {
+  ($($args:tt)*) => {
+    core::panic!($($args)*)
+  };
+}
 #[cfg(not(debug_assertions))]
 #[macro_export]
 macro_rules! build_error {
-  ($($args:tt)+) => {
+  ($($args:tt)*) => {
     unsafe { $crate::__build_error_impl() }
   };
 }
@@ -42,7 +43,7 @@ macro_rules! build_error {
 macro_rules! build_assert {
   ($cond:expr $(,)?) => {
     if !$cond {
-      $crate::build_error!(std::concat!("assertion failed: ", std::stringify!($cond)));
+      $crate::build_error!(core::concat!("assertion failed: ", core::stringify!($cond)));
     }
   };
   ($cond:expr, $($arg:tt)+) => {
@@ -73,7 +74,7 @@ macro_rules! build_assert_eq {
         if !(*left_val == *right_val) {
           $crate::build_error!(
             "assertion `left == right` failed: {}\n  left: {:?}\n right: {:?}",
-            format!($($arg)+),
+            core::format_args!($($arg)+),
             &*left_val,
             &*right_val,
           );
@@ -104,7 +105,7 @@ macro_rules! build_assert_ne {
         if *left_val == *right_val {
           $crate::build_error!(
             "assertion `left != right` failed: {}\n  left: {:?}\n right: {:?}",
-            format!($($arg)+),
+            core::format_args!($($arg)+),
             &*left_val,
             &*right_val,
           );
@@ -157,7 +158,7 @@ mod tests {
   }
 
   fn assert_const_eq<const A: usize, const B: usize>() {
-    build_assert_eq!(A, B, "A must be equal to B, got {} and {}", A, B);
+    build_assert_eq!(A, B, "A must be equal to B, got {A} and {B}");
   }
 
   #[test]
