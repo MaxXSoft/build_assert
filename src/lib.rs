@@ -116,14 +116,15 @@ macro_rules! build_error {
   };
 }
 
-/// Asserts that a boolean expression is true at build-time.
+/// Asserts that a boolean expression is `true` at build-time.
 ///
 /// # Examples
 ///
 #[cfg_attr(build = "debug", doc = "```should_panic")]
 #[cfg_attr(build = "release", doc = "```compile_fail")]
 /// fn foo<const N: usize>() {
-///   build_assert::build_assert!(N.is_power_of_two());
+///   # use build_assert::build_assert;
+///   build_assert!(N.is_power_of_two());
 /// }
 ///
 /// foo::<16>(); // Fine.
