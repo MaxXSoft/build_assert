@@ -1,8 +1,13 @@
 [package]
 name = "build_assert"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package.metadata.docs.rs]
+cargo-args = ["--release"]
+
+[features]
+# Do not use inline assemblies to raise build-time errors.
+no_asm = []
 
 [dependencies]
