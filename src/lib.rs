@@ -1,5 +1,94 @@
 #![no_std]
 
+//! `build_assert` allows you to make assertions at build-time.
+//!
+//! Unlike `assert` and some implementations of compile-time assertions, such
+//! as [`static_assertions`](https://docs.rs/static_assertions), `build_assert`
+//! works before runtime, and can be used for expressions containing const
+//! generics.
+//!
+//! For example, `build_assert` can be used to:
+//!
+#![cfg_attr(build = "debug", doc = "```should_panic")]
+#![cfg_attr(build = "release", doc = "```compile_fail")]
+//! fn foo<const N: usize>() {
+//!   # use build_assert::build_assert;
+//!   build_assert!(N > 5);
+//! }
+//!
+//! foo::<0>(); // Build-time error!
+//! ```
+//!
+//! The above example will **fail to build in release mode**. Due to the
+//! internal implementation, it will **pass the build in debug mode** and panic
+//! at runtime in release mode.
+//!
+//! As a comparison, `assert` will only panic at runtime, and static assertion
+//! implementations can not be applied to const generics:
+//!
+//! ```compile_fail
+//! macro_rules! static_assert {
+//!   ($e:expr) => {
+//!     const _: () = core::assert!($e);
+//!   };
+//! }
+//!
+//! fn foo<const N: usize>() {
+//!   static_assert!(N > 5);
+//! }
+//! ```
+//!
+//! An error occurs when compiling the above example:
+//!
+//! ```text
+//! error[E0401]: can't use generic parameters from outer item
+//!   --> src/lib.rs:36:18
+//!    |
+//! 9  | fn foo<const N: usize>() {
+//!    |              - const parameter from outer item
+//! 10 |   static_assert!(N > 5);
+//!    |                  ^ use of generic parameter from outer item
+//! ```
+//!
+//! # Under the Hood
+//!
+//! Actually `build_assert` should be named `link_assert`, because when the
+//! assertion fails, it will occur a link error like this:
+//!
+//! ```text
+//! error: linking with `cc` failed: exit status: 1
+//!   |
+//!   = note: env -u ...
+//!   = note: Undefined symbols for architecture x86_64:
+//!             "___build_error_impl", referenced from:
+//!                 rust_out::main::... in ... .o
+//!           ld: symbol(s) not found for architecture x86_64
+//!           clang: error: linker command failed with exit code 1 (use -v to see invocation)
+//! ```
+//!
+//! In release mode, the `build_assert` macro will be expanded to:
+//!
+//! ```
+//! # let cond = false;
+//! # fn __build_error_impl() {}
+//! if !cond {
+//!   __build_error_impl();
+//! }
+//! ```
+//!
+//! where the `__build_error_impl` is a function declaration
+//!
+//! # Limitations
+//!
+//! a
+//! No function named as `__build_error_impl`
+//!
+//! # References
+//!
+//! a
+//!
+//! A different approach.
+
 // TODO:
 // 1. reference
 // 2. doc tests
