@@ -1,3 +1,9 @@
+[workspace]
+resolver = "2"
+members = [
+  "env_id",
+]
+
 [package]
 name = "build_assert"
 version = "0.0.1"
