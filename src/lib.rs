@@ -78,6 +78,8 @@
 //!
 //! where the `__build_error_impl` is a function declaration
 //!
+//! https://doc.rust-lang.org/nightly/reference/inline-assembly.html
+//!
 //! # Limitations
 //!
 //! a
@@ -108,7 +110,23 @@ macro_rules! build_error {
     core::panic!($($args)*)
   };
 }
-#[cfg(build = "release")]
+#[cfg(all(build = "release", not(feature = "no_asm")))]
+#[macro_export]
+macro_rules! build_error {
+  ($($args:tt)*) => {
+    unsafe {
+      core::arch::asm!(core::concat!(
+        "build error at ",
+        core::file!(),
+        ":",
+        core::line!(),
+        ":",
+        core::column!()
+      ))
+    }
+  };
+}
+#[cfg(all(build = "release", feature = "no_asm"))]
 #[macro_export]
 macro_rules! build_error {
   ($($args:tt)*) => {
