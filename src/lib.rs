@@ -96,10 +96,17 @@
 // 2. doc tests
 // 3. more doc comments
 
-#[cfg(build = "release")]
+#[cfg(all(build = "release", feature = "no_asm"))]
+macro_rules! decl_fn {
+  ($id:ident) => {
+    #[doc(hidden)]
+    pub fn $id() -> !;
+  };
+}
+
+#[cfg(all(build = "release", feature = "no_asm"))]
 extern "Rust" {
-  #[doc(hidden)]
-  pub fn __build_error_impl() -> !;
+  decl_fn!(__build_error_impl);
 }
 
 /// Emits an error at build-time.
