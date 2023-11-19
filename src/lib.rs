@@ -82,7 +82,7 @@
 //!
 //! # Limitations
 //!
-//! a
+//! Must raise link-time error in some target, which is unreadable.
 //! No function named as `__build_error_impl`
 //!
 //! # References
@@ -95,6 +95,7 @@
 // 1. reference
 // 2. doc tests
 // 3. more doc comments
+// 4. explain features in doc comment
 
 #[cfg(all(build = "release", feature = "no_asm"))]
 macro_rules! decl_fn {
