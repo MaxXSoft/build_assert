@@ -51,25 +51,37 @@
 //! ```
 //!
 //! # Features
-//! 
+//!
 //! By default, [`build_assert`] uses inline assembly (i.e. [`core::arch::asm`])
 //! to raise build-time errors. If you need to build with this crate on a target
 //! that does not support inline assembly (see [the Rust reference]), you can
 //! enable the `no_asm` feature.
-//! 
+//!
 //! When `no_asm` is enabled, [`build_assert`] raises a link error by referencing
 //! an undefined symbol if the assertion fails. By default, the symbol name is
-//! `___build_error_impl`. You can set the environment variable `BUILD_ERROR_SYM`
-//! to specify a different symbol before building:
-//! 
+//! `___build_error_impl`. To avoid symbol conflicts, you can set the environment
+//! variable `BUILD_ERROR_SYM` to specify a different symbol before building:
+//!
 //! ```text
 //! BUILD_ERROR_SYM=hello cargo build --release
 //! ```
-//! 
+//!
 //! Note that if the project has been previously built, the build cache should be
 //! cleared to ensure this change takes effect.
 //!
 //! # Under the Hood
+//!
+//! The `build_assert` macro will be expanded to:
+//!
+//! ```
+//! # let cond = false;
+//! # macro_rules! build_error { () => {}; }
+//! if !cond {
+//!   build_error!();
+//! }
+//! ```
+//! 
+//! In release mode,
 //!
 //! Actually `build_assert` should be named `link_assert`, because when the
 //! assertion fails, it will occur a link error like this:
@@ -85,19 +97,7 @@
 //!           clang: error: linker command failed with exit code 1 (use -v to see invocation)
 //! ```
 //!
-//! In release mode, the `build_assert` macro will be expanded to:
-//!
-//! ```
-//! # let cond = false;
-//! # fn __build_error_impl() {}
-//! if !cond {
-//!   __build_error_impl();
-//! }
-//! ```
-//!
 //! where the `__build_error_impl` is a function declaration
-//!
-//! https://doc.rust-lang.org/nightly/reference/inline-assembly.html
 //!
 //! # Limitations
 //!
@@ -106,17 +106,15 @@
 //!
 //! # References
 //!
-//! https://rust-for-linux.github.io/docs/kernel/macro.build_assert.html
+//! The idea of `build_assert` macro came from the [Rust for Linux] project.
+//! This crate uses a different approach to implement the macro.
 //!
-//! A different approach.
-//! 
 //! [the Rust reference]: https://doc.rust-lang.org/nightly/reference/inline-assembly.html
+//! [Rust for Linux]: https://rust-for-linux.github.io/docs/kernel/macro.build_assert.html
 
 // TODO:
-// 1. reference
-// 2. doc tests
-// 3. more doc comments
-// 4. explain features in doc comment
+// 1. doc tests
+// 2. more doc comments
 
 #[cfg(all(build = "release", feature = "no_asm"))]
 macro_rules! decl_fn {
