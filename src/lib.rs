@@ -50,6 +50,25 @@
 //!    |                  ^ use of generic parameter from outer item
 //! ```
 //!
+//! # Features
+//! 
+//! By default, [`build_assert`] uses inline assembly (i.e. [`core::arch::asm`])
+//! to raise build-time errors. If you need to build with this crate on a target
+//! that does not support inline assembly (see [the Rust reference]), you can
+//! enable the `no_asm` feature.
+//! 
+//! When `no_asm` is enabled, [`build_assert`] raises a link error by referencing
+//! an undefined symbol if the assertion fails. By default, the symbol name is
+//! `___build_error_impl`. You can set the environment variable `BUILD_ERROR_SYM`
+//! to specify a different symbol before building:
+//! 
+//! ```text
+//! BUILD_ERROR_SYM=hello cargo build --release
+//! ```
+//! 
+//! Note that if the project has been previously built, the build cache should be
+//! cleared to ensure this change takes effect.
+//!
 //! # Under the Hood
 //!
 //! Actually `build_assert` should be named `link_assert`, because when the
@@ -83,13 +102,15 @@
 //! # Limitations
 //!
 //! Must raise link-time error in some target, which is unreadable.
-//! No function named as `__build_error_impl`
+//! No function named as `__build_error_impl` (can be changed by setting `BUILD_ERROR_SYM`)
 //!
 //! # References
 //!
-//! a
+//! https://rust-for-linux.github.io/docs/kernel/macro.build_assert.html
 //!
 //! A different approach.
+//! 
+//! [the Rust reference]: https://doc.rust-lang.org/nightly/reference/inline-assembly.html
 
 // TODO:
 // 1. reference
