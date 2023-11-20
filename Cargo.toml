@@ -17,3 +17,4 @@ cargo-args = ["--release"]
 no_asm = []
 
 [dependencies]
+env_id = { path = "./env_id", version = "0.0.1" }

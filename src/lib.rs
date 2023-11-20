@@ -107,7 +107,7 @@ macro_rules! decl_fn {
 
 #[cfg(all(build = "release", feature = "no_asm"))]
 extern "Rust" {
-  decl_fn!(__build_error_impl);
+  env_id::env_id!("BUILD_ERROR_SYM" ?: __build_error_impl => decl_fn);
 }
 
 /// Emits an error at build-time.
