@@ -110,6 +110,13 @@ extern "Rust" {
   env_id::env_id!("BUILD_ERROR_SYM" ?: __build_error_impl => decl_fn);
 }
 
+#[cfg(all(build = "release", feature = "no_asm"))]
+#[doc(hidden)]
+#[inline(always)]
+pub fn build_error() {
+  unsafe { env_id::env_id!("BUILD_ERROR_SYM" ?: __build_error_impl)() };
+}
+
 /// Emits an error at build-time.
 #[cfg(build = "debug")]
 #[macro_export]
@@ -138,7 +145,7 @@ macro_rules! build_error {
 #[macro_export]
 macro_rules! build_error {
   ($($args:tt)*) => {
-    unsafe { $crate::__build_error_impl() }
+    $crate::build_error()
   };
 }
 
