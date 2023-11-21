@@ -1,0 +1,34 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'skip-ci')"
+    timeout-minutes: 30
+    steps:
+    - name: Checkout build_assert
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: cargo check --workspace &&
+           cargo check --workspace --all-features &&
+           cargo check --workspace --release &&
+           cargo check --workspace --release --all-features
+
+    - name: Clippy
+      run: cargo clippy --workspace -- -D warnings &&
+           cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+    - name: Test
+      env: RUSTDOCFLAGS="-C opt-level=3"
+      run: cargo test --workspace &&
+           cargo test --workspace --all-features &&
+           cargo test --workspace --release &&
+           cargo test --workspace --release --all-features
