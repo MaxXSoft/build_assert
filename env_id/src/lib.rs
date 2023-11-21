@@ -1,3 +1,44 @@
+//! Use environment variables as identifiers.
+//!
+//! # Examples
+//!
+//! ```
+//! # use env_id::env_id;
+//! let env_id!("CARGO_CRATE_NAME") = 1;
+//! dbg!(env_id!("CARGO_CRATE_NAME"));
+//! ```
+//!
+//! Or you can provide a default value:
+//!
+//! ```
+//! # use env_id::env_id;
+//! let env_id!("HELLO" ?: hello) = 1;
+//! dbg!(env_id!("HELLO" ?: hello));
+//! ```
+//!
+//! This may be useful when you want to let users specify the name of a
+//! public item, but the following code doesn't compile:
+//!
+//! ```compile_fail
+//! # fn main() {}
+//! # use env_id::env_id;
+//! pub const env_id!("HELLO" ?: hello): usize = 1;
+//! ```
+//!
+//! You can use another macro to do the same thing:
+//!
+//! ```
+//! # fn main() {}
+//! # use env_id::env_id;
+//! macro_rules! def_const {
+//!   ($id:ident) => {
+//!     pub const $id: usize = 1;
+//!   };
+//! }
+//!
+//! env_id!("HELLO"?: hello => def_const);
+//! ```
+
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
@@ -5,6 +46,19 @@ use syn::{
   Error, Ident, LitStr, Result, Token,
 };
 
+/// Uses the given environment variable as an identifier.
+/// 
+/// See the [module-level documentation](self) for more information.
+/// 
+/// # Definition
+/// 
+/// ```
+/// macro_rules! env_id {
+///   ($name:literal) => { ... };
+///   ($name:literal ?: $default_id:ident) => { ... };
+///   ($name:literal ?: $default_id:ident => $apply_to:ident) => { ... };
+/// }
+/// ```
 #[proc_macro]
 pub fn env_id(tokens: TokenStream) -> TokenStream {
   match parse_env_id(tokens) {
