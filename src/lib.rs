@@ -140,10 +140,6 @@
 //! [the Rust reference]: https://doc.rust-lang.org/nightly/reference/inline-assembly.html
 //! [Rust for Linux]: https://rust-for-linux.github.io/docs/kernel/macro.build_assert.html
 
-// TODO:
-// 1. doc tests
-// 2. more doc comments
-
 #[cfg(all(build = "release", feature = "no_asm"))]
 macro_rules! decl_fn {
   ($id:ident) => {
@@ -232,16 +228,30 @@ macro_rules! build_error {
 
 /// Asserts that a boolean expression is `true` at build-time.
 ///
+/// In release mode, if the expression is evaluated to `false`, or the compiler
+/// or optimizer cannot ensure that the expression is evaluated to `true`, this
+/// macro will stop the compilation process.
+///
+/// In debug mode, if the expression is evaluated to `false`, this macro will
+/// panic.
+///
 /// # Examples
 ///
-#[cfg_attr(build = "debug", doc = "```should_panic")]
-#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// ```
 /// fn foo<const N: usize>() {
 ///   # use build_assert::build_assert;
-///   build_assert!(N.is_power_of_two());
+///   build_assert!(N.is_power_of_two(), "N is not a power of two");
 /// }
 ///
 /// foo::<16>(); // Fine.
+/// ```
+///
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// # fn foo<const N: usize>() {
+/// #   use build_assert::build_assert;
+/// #   build_assert!(N.is_power_of_two());
+/// # }
 /// foo::<15>(); // Fails to compile in release mode, panics in debug mode.
 /// ```
 #[macro_export]
@@ -258,6 +268,35 @@ macro_rules! build_assert {
   };
 }
 
+/// Asserts that two expressions are equal to each other at build-time (using
+/// [PartialEq]).
+///
+/// In release mode, if the expression is evaluated to `false`, or the compiler
+/// or optimizer cannot ensure that the expression is evaluated to `true`, this
+/// macro will stop the compilation process.
+///
+/// In debug mode, if the expression is evaluated to `false`, this macro will
+/// panic.
+///
+/// # Examples
+///
+/// ```
+/// fn foo<const A: usize, const B: usize>() {
+///   # use build_assert::build_assert_eq;
+///   build_assert_eq!(A, B, "A and B are not equal");
+/// }
+///
+/// foo::<1, 1>(); // Fine.
+/// ```
+///
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// # fn foo<const A: usize, const B: usize>() {
+/// #   use build_assert::build_assert_eq;
+/// #   build_assert_eq!(A, B);
+/// # }
+/// foo::<1, 2>(); // Fails to compile in release mode, panics in debug mode.
+/// ```
 #[macro_export]
 macro_rules! build_assert_eq {
   ($left:expr, $right:expr $(,)?) => {
@@ -289,6 +328,35 @@ macro_rules! build_assert_eq {
   };
 }
 
+/// Asserts that two expressions are not equal to each other at build-time
+/// (using [PartialEq]).
+///
+/// In release mode, if the expression is evaluated to `false`, or the compiler
+/// or optimizer cannot ensure that the expression is evaluated to `true`, this
+/// macro will stop the compilation process.
+///
+/// In debug mode, if the expression is evaluated to `false`, this macro will
+/// panic.
+///
+/// # Examples
+///
+/// ```
+/// fn foo<const A: usize, const B: usize>() {
+///   # use build_assert::build_assert_ne;
+///   build_assert_ne!(A, B, "A and B are equal");
+/// }
+///
+/// foo::<1, 2>(); // Fine.
+/// ```
+///
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// # fn foo<const A: usize, const B: usize>() {
+/// #   use build_assert::build_assert_ne;
+/// #   build_assert_ne!(A, B);
+/// # }
+/// foo::<1, 1>(); // Fails to compile in release mode, panics in debug mode.
+/// ```
 #[macro_export]
 macro_rules! build_assert_ne {
   ($left:expr, $right:expr $(,)?) => {
