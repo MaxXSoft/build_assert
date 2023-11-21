@@ -7,7 +7,7 @@
 //! works before runtime, and can be used for expressions containing const
 //! generics.
 //!
-//! For example:
+//! # Examples
 //!
 //! ```
 //! fn foo<const N: usize>() {
