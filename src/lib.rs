@@ -2,7 +2,7 @@
 
 //! [`build_assert`] allows you to make assertions at build-time.
 //!
-//! Unlike `assert` and some implementations of compile-time assertions, such
+//! Unlike [`assert`] and some implementations of compile-time assertions, such
 //! as [`static_assertions`](https://docs.rs/static_assertions), [`build_assert`]
 //! works before runtime, and can be used for expressions containing const
 //! generics.
@@ -31,7 +31,7 @@
 //! internal implementation, it will **pass the build and panic at runtime**
 //! in debug mode.
 //!
-//! As a comparison, `assert` will only panic at runtime, and static assertion
+//! As a comparison, [`assert`] will only panic at runtime, and static assertion
 //! implementations can not be applied to const generics:
 //!
 //! ```compile_fail
@@ -134,7 +134,7 @@
 //!
 //! # References
 //!
-//! The idea of `build_assert` macro came from the [Rust for Linux] project.
+//! The idea of [`build_assert`] macro came from the [Rust for Linux] project.
 //! This crate uses a different approach to implement the macro.
 //!
 //! [the Rust reference]: https://doc.rust-lang.org/nightly/reference/inline-assembly.html
