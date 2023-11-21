@@ -1,7 +1,15 @@
 [package]
 name = "env_id"
 version = "0.0.1"
+authors = ["MaxXing <x@MaxXSoft.net>"]
 edition = "2021"
+description = "Use environment variables as identifiers."
+repository = "https://github.com/MaxXSoft/build_assert"
+documentation = "https://docs.rs/env_id"
+categories = ["development-tools", "no-std", "no-std::no-alloc"]
+keywords = ["macros"]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
 
 [lib]
 proc-macro = true
