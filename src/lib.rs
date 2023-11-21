@@ -1,22 +1,30 @@
 #![no_std]
 
-//! `build_assert` allows you to make assertions at build-time.
+//! [`build_assert`] allows you to make assertions at build-time.
 //!
 //! Unlike `assert` and some implementations of compile-time assertions, such
-//! as [`static_assertions`](https://docs.rs/static_assertions), `build_assert`
+//! as [`static_assertions`](https://docs.rs/static_assertions), [`build_assert`]
 //! works before runtime, and can be used for expressions containing const
 //! generics.
 //!
-//! For example, `build_assert` can be used to:
+//! For example:
 //!
-#![cfg_attr(build = "debug", doc = "```should_panic")]
-#![cfg_attr(build = "release", doc = "```compile_fail")]
+//! ```
 //! fn foo<const N: usize>() {
 //!   # use build_assert::build_assert;
 //!   build_assert!(N > 5);
 //! }
 //!
-//! foo::<0>(); // Build-time error!
+//! foo::<10>(); // Fine.
+//! ```
+//!
+#![cfg_attr(build = "debug", doc = "```should_panic")]
+#![cfg_attr(build = "release", doc = "```compile_fail")]
+//! # fn foo<const N: usize>() {
+//! #   use build_assert::build_assert;
+//! #   build_assert!(N > 5);
+//! # }
+//! foo::<0>();  // Fails to compile.
 //! ```
 //!
 //! The above example will **fail to build in release mode**. Due to the
@@ -59,7 +67,7 @@
 //!
 //! When `no_asm` is enabled, [`build_assert`] raises a link error by referencing
 //! an undefined symbol if the assertion fails. By default, the symbol name is
-//! `___build_error_impl`. To avoid symbol conflicts, you can set the environment
+//! `__build_error_impl`. To avoid symbol conflicts, you can set the environment
 //! variable `BUILD_ERROR_SYM` to specify a different symbol before building:
 //!
 //! ```text
@@ -112,11 +120,11 @@
 //! error: linking with `cc` failed: exit status: 1
 //!   |
 //!   = note: env -u ...
-//!   = note: Undefined symbols for architecture x86_64:
-//!             "___build_error_impl", referenced from:
-//!                 rust_out::main::... in ... .o
-//!           ld: symbol(s) not found for architecture x86_64
-//!           clang: error: linker command failed with exit code 1 (use -v to see invocation)
+//!   = note: /usr/bin/ld: ... .o: in function `rust_out::main::...':
+//!           ... .rs:6: undefined reference to `__build_error_impl'
+//!           collect2: error: ld returned 1 exit status
+//!
+//!   = note: ...
 //! ```
 //!
 //! In debug mode, since the optimizer will not run, the [`build_error`] macro
@@ -163,8 +171,7 @@ pub fn build_error() {
 ///
 /// # Examples
 ///
-#[cfg_attr(build = "debug", doc = "```should_panic")]
-#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// ```should_panic
 /// # use build_assert::build_error;
 /// build_error!("this is a hard error");
 /// ```
@@ -183,8 +190,7 @@ macro_rules! build_error {
 ///
 /// # Examples
 ///
-#[cfg_attr(build = "debug", doc = "```should_panic")]
-#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// ```compile_fail
 /// # use build_assert::build_error;
 /// build_error!("this is a hard error");
 /// ```
@@ -212,8 +218,7 @@ macro_rules! build_error {
 ///
 /// # Examples
 ///
-#[cfg_attr(build = "debug", doc = "```should_panic")]
-#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// ```compile_fail
 /// # use build_assert::build_error;
 /// build_error!("this is a hard error");
 /// ```
