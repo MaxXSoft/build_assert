@@ -16,12 +16,6 @@ jobs:
     - name: Checkout build_assert
       uses: actions/checkout@v2
 
-    - name: Build
-      run: cargo check --workspace &&
-           cargo check --workspace --all-features &&
-           cargo check --workspace --release &&
-           cargo check --workspace --release --all-features
-
     - name: Clippy
       run: cargo clippy --workspace -- -D warnings &&
            cargo clippy --workspace --all-targets --all-features -- -D warnings
