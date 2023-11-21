@@ -7,7 +7,15 @@ members = [
 [package]
 name = "build_assert"
 version = "0.0.1"
+authors = ["MaxXing <x@MaxXSoft.net>"]
 edition = "2021"
+description = "Asserts const generic expressions at build-time."
+repository = "https://github.com/MaxXSoft/build_assert"
+documentation = "https://docs.rs/build_assert"
+categories = ["no-std", "rust-patterns", "development-tools::testing"]
+keywords = ["assert", "build", "static", "testing"]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["-C", "opt-level=3"]
