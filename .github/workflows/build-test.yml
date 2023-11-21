@@ -27,7 +27,8 @@ jobs:
            cargo clippy --workspace --all-targets --all-features -- -D warnings
 
     - name: Test
-      env: RUSTDOCFLAGS="-C opt-level=3"
+      env:
+        RUSTDOCFLAGS: "-C opt-level=3"
       run: cargo test --workspace &&
            cargo test --workspace --all-features &&
            cargo test --workspace --release &&
