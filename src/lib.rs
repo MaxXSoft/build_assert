@@ -156,7 +156,18 @@ pub fn build_error() {
   unsafe { env_id::env_id!("BUILD_ERROR_SYM" ?: __build_error_impl)() };
 }
 
-/// Emits an error at build-time.
+/// Raises a build-time error.
+///
+/// This macro will stop the compilation process in release mode, and always
+/// panic in debug mode.
+///
+/// # Examples
+///
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// # use build_assert::build_error;
+/// build_error!("this is a hard error");
+/// ```
 #[cfg(build = "debug")]
 #[macro_export]
 macro_rules! build_error {
@@ -164,6 +175,19 @@ macro_rules! build_error {
     core::panic!($($args)*)
   };
 }
+
+/// Raises a build-time error.
+///
+/// This macro will stop the compilation process in release mode, and always
+/// panic in debug mode.
+///
+/// # Examples
+///
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// # use build_assert::build_error;
+/// build_error!("this is a hard error");
+/// ```
 #[cfg(all(build = "release", not(feature = "no_asm")))]
 #[macro_export]
 macro_rules! build_error {
@@ -180,6 +204,19 @@ macro_rules! build_error {
     }
   };
 }
+
+/// Raises a build-time error.
+///
+/// This macro will stop the compilation process in release mode, and always
+/// panic in debug mode.
+///
+/// # Examples
+///
+#[cfg_attr(build = "debug", doc = "```should_panic")]
+#[cfg_attr(build = "release", doc = "```compile_fail")]
+/// # use build_assert::build_error;
+/// build_error!("this is a hard error");
+/// ```
 #[cfg(all(build = "release", feature = "no_asm"))]
 #[macro_export]
 macro_rules! build_error {
