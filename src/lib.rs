@@ -20,8 +20,8 @@
 //! ```
 //!
 //! The above example will **fail to build in release mode**. Due to the
-//! internal implementation, it will **pass the build in debug mode** and panic
-//! at runtime in release mode.
+//! internal implementation, it will **pass the build and panic at runtime**
+//! in debug mode.
 //!
 //! As a comparison, `assert` will only panic at runtime, and static assertion
 //! implementations can not be applied to const generics:
@@ -71,7 +71,7 @@
 //!
 //! # Under the Hood
 //!
-//! The `build_assert` macro will be expanded to:
+//! The [`build_assert`] macro will be expanded to:
 //!
 //! ```
 //! # let cond = false;
@@ -80,11 +80,33 @@
 //!   build_error!();
 //! }
 //! ```
-//! 
-//! In release mode,
 //!
-//! Actually `build_assert` should be named `link_assert`, because when the
-//! assertion fails, it will occur a link error like this:
+//! In release mode, the condition of `if` expression is expected to be
+//! evaluated by the optimizer. If `cond` is `true`, the results of
+//! [`build_error`] macro expansion will be optimized away. Otherwise, the
+//! expansion results will be retained.
+//!
+//! On targets that support inline assembly, the [`build_error`] macro will
+//! expand to:
+//!
+//! ```compile_fail
+//! core::arch::asm!("build error at file.rs:line:column");
+//! ```
+//!
+//! Since `build` is not a valid instruction on any target, the build will fail.
+//!
+//! On targets that do not support inline assembly, the [`build_error`] macro
+//! will expand to:
+//!
+//! ```compile_fail
+//! extern "Rust" {
+//!   fn __build_error_impl() -> !;
+//! }
+//!
+//! unsafe { __build_error_impl() }
+//! ```
+//!
+//! It will occur a link error like this:
 //!
 //! ```text
 //! error: linking with `cc` failed: exit status: 1
@@ -97,12 +119,10 @@
 //!           clang: error: linker command failed with exit code 1 (use -v to see invocation)
 //! ```
 //!
-//! where the `__build_error_impl` is a function declaration
-//!
-//! # Limitations
-//!
-//! Must raise link-time error in some target, which is unreadable.
-//! No function named as `__build_error_impl` (can be changed by setting `BUILD_ERROR_SYM`)
+//! In debug mode, since the optimizer will not run, the [`build_error`] macro
+//! will always be retained. We cannot raise build errors using the above method,
+//! otherwise no matter whether the condition is `true` or not, the build will
+//! always fail. So the [`build_error`] macro will expand to a [`panic`].
 //!
 //! # References
 //!
