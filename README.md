@@ -99,7 +99,7 @@ extern "Rust" {
 unsafe { __build_error_impl() }
 ```
 
-It will occur a link error like this:
+It raises a link error like this:
 
 ```text
 error: linking with `cc` failed: exit status: 1
